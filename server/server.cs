@@ -50,28 +50,35 @@ public class PipeServer
 
     public void ProcessClientThread(object o)
     {
-        NamedPipeServerStream pipeStream = (NamedPipeServerStream)o;
-        
-        var streamReader = new StreamReader(pipeStream);
-        var streamWriter = new StreamWriter(pipeStream);
+        try
+        {
+            NamedPipeServerStream pipeStream = (NamedPipeServerStream)o;
 
-      
-
-        String requestString = streamReader.ReadLine();
-
-        Console.WriteLine(
-            "PipeStream Instance#" + pipeStream.GetHashCode() + 
-            " recieved message: "+ requestString);
+            var streamReader = new StreamReader(pipeStream);
+            var streamWriter = new StreamWriter(pipeStream);
 
 
 
-        Thread.Sleep(5000);
-        streamWriter.WriteLine(requestString.Length);
-        streamWriter.Flush();
-        pipeStream.WaitForPipeDrain();
+            String requestString = streamReader.ReadLine();
 
-        pipeStream.Close();
-        pipeStream.Dispose();
+            Console.WriteLine(
+                "PipeStream Instance#" + pipeStream.GetHashCode() +
+                " recieved message: " + requestString);
+
+
+
+            Thread.Sleep(20000);
+            streamWriter.WriteLine(requestString.Length);
+            streamWriter.Flush();
+            pipeStream.WaitForPipeDrain();
+
+            pipeStream.Close();
+            pipeStream.Dispose();
+        }
+        catch (System.IO.IOException e)
+        {
+            Console.WriteLine("error while processing client" + e);
+        }
     }
 
     public void ProcessNextClient()
